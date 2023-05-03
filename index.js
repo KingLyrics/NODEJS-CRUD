@@ -106,6 +106,20 @@ const server = http.createServer((req, res) => {
         sendResponse(400, { error: "Invalid request body" });
       }
     });
+  } else if (req.method === "DELETE" && req.url.startsWith("/employees/")) {
+    const employeeId = req.url.split("/")[2];
+    const query = `DELETE FROM Employee_data WHERE id=${employeeId}`;
+    conn.query(query, (error, results) => {
+      if (error) {
+        console.error("Error in deleting employee data: ", error);
+        sendResponse(500, { error: "Error in delting employee data" });
+      } else if (results.affectedRows === 0) {
+        sendResponse(404, { error: "Employee not found" });
+      } else {
+        console.log(`Employee with the id of ${employeeId} has been deleted`);
+        sendResponse(200, { message: "Employee data has been deleted" });
+      }
+    });
   }
 });
 
