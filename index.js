@@ -57,6 +57,8 @@ const server = http.createServer((req, res) => {
         }
       });
     });
+  } else if (req.method === "PATCH" && req.url === "/employees:id") {
+    res.end("<h1>Change custom emp</h1>");
   }
 });
 
