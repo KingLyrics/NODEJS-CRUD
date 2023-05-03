@@ -23,12 +23,12 @@ The application exposes the following API endpoints:
 The payload for adding or updating an employee should be in the following JSON format:
 `
 {
-  "name": "John Doe",
-  "age": 30,
-  "phone": "555-555-5555",
-  "years_of_exp": 5,
-  "department": "IT",
-  "skills": "Node.js, React"
+  "NAME": "John Doe",
+  "AGE": 30,
+  "PHONE": "555-555-5555",
+  "YEARS_OF_EXP": 5,
+  "DEPARTEMENT": "IT",
+  "SKILLS": "Node.js, React"
 }
 `
 
