@@ -36,7 +36,7 @@ Dependencies
 
 This application uses the following dependencies:
 
-    express: A popular Node.js web framework for building APIs
+   dotenv: Loads environment variables from .env file
     mysql: A Node.js library for connecting to MySQL databases
 
 Conclusion
