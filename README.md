@@ -16,7 +16,6 @@ Usage
 The application exposes the following API endpoints:
 
     GET /employees: Get a list of all employees
-    GET /employees/:id: Get an employee by ID
     POST /employees: Add a new employee
     PATCH /employees/:id: Update an employee by ID
     DELETE /employees/:id: Delete an employee by ID
