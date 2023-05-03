@@ -23,6 +23,11 @@ const server = http.createServer((req, res) => {
     "Content-Type": "application/json",
   };
 
+  let body = "";
+  req.on("data", (chunk) => {
+    body += chunk.toString();
+  });
+
   const sendResponse = (statusCode, payload) => {
     res.writeHead(statusCode, headers);
     res.end(JSON.stringify(payload));
@@ -38,10 +43,6 @@ const server = http.createServer((req, res) => {
       }
     });
   } else if (req.method === "POST" && req.url === "/employees") {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk.toString();
-    });
     req.on("end", () => {
       const { NAME, AGE, PHONE, YEARS_OF_EXP, DEPARTMENT, SKILLS } =
         JSON.parse(body);
@@ -57,8 +58,54 @@ const server = http.createServer((req, res) => {
         }
       });
     });
-  } else if (req.method === "PATCH" && req.url === "/employees:id") {
-    res.end("<h1>Change custom emp</h1>");
+  } else if (req.method === "PATCH" && req.url.startsWith("/employees/")) {
+    const employeeId = req.url.split("/")[2];
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+    req.on("end", () => {
+      try {
+        const { NAME, AGE, PHONE, YEARS_OF_EXP, DEPARTMENT, SKILLS } =
+          JSON.parse(body);
+        const updateFields = [];
+        if (NAME) {
+          updateFields.push(`NAME='${NAME}'`);
+        }
+        if (AGE) {
+          updateFields.push(`age=${AGE}`);
+        }
+        if (PHONE) {
+          updateFields.push(`phone=${PHONE}`);
+        }
+        if (YEARS_OF_EXP) {
+          updateFields.push(`years_of_exp=${YEARS_OF_EXP}`);
+        }
+        if (DEPARTMENT) {
+          updateFields.push(`department='${DEPARTMENT}'`);
+        }
+        if (SKILLS) {
+          updateFields.push(`skills='${SKILLS}'`);
+        }
+        const query = `UPDATE Employee_data SET ${updateFields.join(
+          ","
+        )} WHERE id=${employeeId}`;
+        conn.query(query, (error, results) => {
+          if (error) {
+            console.error("Error updating employee data: ", error);
+            sendResponse(500, { error: "Error updating employee data" });
+          } else if (results.affectedRows === 0) {
+            sendResponse(404, { error: "Employee not found" });
+          } else {
+            console.log(`Employee with id ${employeeId} updated: `, results);
+            sendResponse(200, { message: "Employee updated successfully!" });
+          }
+        });
+      } catch (err) {
+        console.error("Error parsing request body as JSON: ", err);
+        sendResponse(400, { error: "Invalid request body" });
+      }
+    });
   }
 });
 
