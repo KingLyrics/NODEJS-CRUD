@@ -1,6 +1,5 @@
 const mysql = require("mysql");
 const http = require("http");
-const JSON = require('body-parser')
 require("dotenv").config();
 
 const conn = mysql.createConnection({
@@ -39,27 +38,25 @@ const server = http.createServer((req, res) => {
       }
     });
   } else if (req.method === "POST" && req.url === "/employees") {
-
-    const { name, age, phone, years_of_exp, department, skills } = body;
-
-    conn.query(
-      `INSERT INTO Employee_data (name,age,phone,yearsofexp,department,skills) VALUES ('${name}', ${age}, ${phone}, ${years_of_exp}, '${department}', '${skills}')`,
-      (error, results) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+    req.on("end", () => {
+      const { NAME, AGE, PHONE, YEARS_OF_EXP, DEPARTMENT, SKILLS } =
+        JSON.parse(body);
+      const query = `INSERT INTO Employee_data (NAME, age, phone, years_of_exp, department, skills)
+                        VALUES ('${NAME}', ${AGE}, ${PHONE}, ${YEARS_OF_EXP}, '${DEPARTMENT}', '${SKILLS}')`;
+      conn.query(query, (error, results) => {
         if (error) {
+          console.error("Error inserting employee data: ", error);
           sendResponse(500, { error: "Error adding employees" });
         } else {
-          sendResponse(201, results);
-          console.log("Employee Added to the database");
+          console.log("Employee added to the database: ", results);
+          sendResponse(201, { message: "Employee added successfully!" });
         }
-      }
-    );
-  } else if (req.method === "DELETE" && req.url === "/about:id") {
-    // Handle all other requests
-  } else if (req.method === "UPDATE" && req.url === "/employee:id") {
-    res.end();
-  } else {
-    res.statusCode = 404;
-    res.end("404 Not Found");
+      });
+    });
   }
 });
 
